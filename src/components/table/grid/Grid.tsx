@@ -89,7 +89,7 @@ const Grid = (config: GridConfiguration) => {
             }, 10 * i)
         }
 
-        // wait till first timeout until
+        // show shortest path after visited nodes are visualized
         setTimeout(() => {
             // animate shortest path
             for (let i = 0; i < shortestPath.length; i++) {
@@ -98,7 +98,6 @@ const Grid = (config: GridConfiguration) => {
                     let el = document.getElementById("cell-" + currCell.coordinate.row + "-" + currCell.coordinate.col);
                     if (el) {
                         el.classList.add("cell--is-shortest-path");
-                        visitedEl.push(el)
                     }
                 }, 30 * i)
             }

@@ -86,7 +86,7 @@ export class Dijkstra extends AbstractAlgorithm {
         return neighbors;
     }
 
-    public getShortestPath(): Array<ICell> {
+    getShortestPath(): Array<ICell> {
         let shortestPath: Array<ICell> = [];
 
         if (this.finishNode) {
