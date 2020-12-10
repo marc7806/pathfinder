@@ -11,15 +11,15 @@ const getClass = (cell: ICell) => {
     let result = ["cell"];
     result.push(
         (cell.isStart ? "cell--is-start" :
-            cell.isFinish ? "cell--is-finish" :
-                cell.isVisited ? "cell--is-visited" : ""));
+            cell.isFinish ? "cell--is-finish" : ""));
 
     return result.join(" ");
 };
 
 const Cell = (props: CellProps) => {
     return (
-        <div onClick={() => props.onClickHandler(props.cell)} className={getClass(props.cell)}/>
+        <div id={"cell-" + props.cell.coordinate.row + "-" + props.cell.coordinate.col}
+             onClick={() => props.onClickHandler(props.cell)} className={getClass(props.cell)}/>
     );
 };
 
