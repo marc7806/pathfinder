@@ -131,22 +131,23 @@ const Grid = (config: GridConfiguration) => {
                 <input type="radio" value={OnClickEventType.SET_FINISH} name="onClickEventType"
                        checked={onClickType === OnClickEventType.SET_FINISH}
                        onChange={() => setOnClickType(OnClickEventType.SET_FINISH)}/> Set Finish
-            </div>
-            <div>
-                <button disabled={isRunning} onClick={() => startDijkstra()}>Start Dijkstra Algorithm</button>
-            </div>
-            <div className="grid__container">
-                {
-                    grid.map((row, rowIdx) => {
-                        return <div key={rowIdx} className="grid__container__row">
-                            {row.map((cell, cellIdx) => <Cell key={cellIdx} cell={cell}
-                                                              onClickHandler={(cell: ICell) => handleOnClick(cell)}/>)}
-                        </div>
-                    })
-                }
+
+                <button disabled=
+                            {isRunning} onClick={() => startDijkstra()}>Start Dijkstra Algorithm
+                </button>
+                <div className="grid__container">
+                    {
+                        grid.map((row, rowIdx) => {
+                            return <div key={rowIdx} className="grid__container__row">
+                                {row.map((cell, cellIdx) => <Cell key={cellIdx} cell={cell}
+                                                                  onClickHandler={(cell: ICell) => handleOnClick(cell)}/>)}
+                            </div>
+                        })
+                    }
+                </div>
             </div>
         </div>
-    );
+    )
 };
 
 export default Grid;
