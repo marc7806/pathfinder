@@ -14,7 +14,7 @@
 }
 
 .cell--is-visited {
-    background: cornflowerblue;
+    background: var(--color-main);
     animation-name: visitAnim;
     animation-duration: .5s;
 }

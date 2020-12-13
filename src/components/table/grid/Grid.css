@@ -1,10 +1,21 @@
 .grid__container {
     width: 100%;
     line-height: 0;
-    margin-top: 100px;
+    margin-top: 50px;
 }
+
 .grid__container__row {
     margin: 0;
     padding: 0;
     height: auto;
 }
+
+.algorithm-selection {
+    margin: 30px;
+    display: grid;
+    grid-template-columns: 150px 200px 200px;
+    column-gap: 50px;
+    justify-content: center;
+    align-items: center;
+}
+

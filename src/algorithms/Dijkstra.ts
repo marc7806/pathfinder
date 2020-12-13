@@ -14,25 +14,15 @@ import {isEqual} from "../utils/Utils";
  * 5. Repeat from 2 until endCell found
  */
 export class Dijkstra extends AbstractAlgorithm {
-    private readonly grid: Array<ICell[]>;
-    private readonly start: ICell;
-    private end: ICell;
-    // needed for shortest path
-    private finishNode: INode | null;
-
-    constructor(grid: Array<ICell[]>, startCell: ICell, endCell: ICell) {
+    constructor() {
         super();
-        this.grid = grid;
-        this.start = startCell;
-        this.end = endCell;
-        this.finishNode = null;
     }
 
-    compute(): Array<ICell> {
+    compute(grid: Array<ICell[]>, startCell: ICell, endCell: ICell): Array<ICell> {
         let visitedCellsInOrder: Array<ICell> = [];
 
         const start = {
-            cell: this.start,
+            cell: startCell,
             distance: 0,
             prev: null
         };
@@ -47,9 +37,9 @@ export class Dijkstra extends AbstractAlgorithm {
                     visitedCellsInOrder.push(curr.cell);
                 }
 
-                let neighbors: Array<INode> = this.findNeighbors(curr);
+                let neighbors: Array<INode> = this.findNeighbors(curr, grid);
                 neighbors.forEach(n => {
-                    if (isEqual(n.cell.coordinate, this.end.coordinate)) {
+                    if (isEqual(n.cell.coordinate, endCell.coordinate)) {
                         isFinished = true;
                         this.finishNode = n;
                     } else if (!visitedCellsInOrder.includes(n.cell) && !minHeap.data.includes(n)
@@ -66,21 +56,21 @@ export class Dijkstra extends AbstractAlgorithm {
         return visitedCellsInOrder;
     }
 
-    private findNeighbors(node: INode) {
+    private findNeighbors(node: INode, grid: Array<ICell[]>) {
         let neighbors: Array<INode> = [];
         let {coordinate} = node.cell;
 
-        if (this.grid[coordinate.row + 1]) {
-            neighbors.push(cellToNode(this.grid[coordinate.row + 1][coordinate.col], node.distance + 1, node))
+        if (grid[coordinate.row + 1]) {
+            neighbors.push(cellToNode(grid[coordinate.row + 1][coordinate.col], node.distance + 1, node))
         }
-        if (this.grid[coordinate.row - 1]) {
-            neighbors.push(cellToNode(this.grid[coordinate.row - 1][coordinate.col], node.distance + 1, node))
+        if (grid[coordinate.row - 1]) {
+            neighbors.push(cellToNode(grid[coordinate.row - 1][coordinate.col], node.distance + 1, node))
         }
-        if (this.grid[coordinate.row][coordinate.col + 1]) {
-            neighbors.push(cellToNode(this.grid[coordinate.row][coordinate.col + 1], node.distance + 1, node))
+        if (grid[coordinate.row][coordinate.col + 1]) {
+            neighbors.push(cellToNode(grid[coordinate.row][coordinate.col + 1], node.distance + 1, node))
         }
-        if (this.grid[coordinate.row][coordinate.col - 1]) {
-            neighbors.push(cellToNode(this.grid[coordinate.row][coordinate.col - 1], node.distance + 1, node))
+        if (grid[coordinate.row][coordinate.col - 1]) {
+            neighbors.push(cellToNode(grid[coordinate.row][coordinate.col - 1], node.distance + 1, node))
         }
 
         return neighbors;

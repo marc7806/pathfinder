@@ -1,6 +1,9 @@
+import {AbstractAlgorithm} from "../algorithms/AbstractAlgorithm";
+
 export interface GridConfiguration {
     numColumns: number,
-    numRows: number
+    numRows: number,
+    algorithms: Array<Algorithm>
 }
 
 export interface ICoordinate {
@@ -18,6 +21,11 @@ export interface INode {
     cell: ICell,
     distance: number,
     prev: INode | null
+}
+
+export interface Algorithm {
+    name: String,
+    instance: AbstractAlgorithm
 }
 
 export enum OnClickEventType {

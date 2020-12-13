@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import "./Grid.css"
 import Cell from "../cell/Cell";
-import {GridConfiguration, ICell, OnClickEventType} from "../../../types/GridTypes";
+import {Algorithm, GridConfiguration, ICell, OnClickEventType} from "../../../types/GridTypes";
 import {Dijkstra} from "../../../algorithms/Dijkstra";
 
 let INIT_START: ICell = {
@@ -44,6 +44,7 @@ const computeInitialGrid = (config: GridConfiguration, startCell: ICell, endCell
 
 const Grid = (config: GridConfiguration) => {
     const [grid, setGrid] = useState<Array<ICell[]>>([[]]);
+    const [algorithm, setAlgorithm] = useState<Algorithm>({name: "", instance: new Dijkstra()});
     const [onClickType, setOnClickType] = useState<OnClickEventType>(OnClickEventType.SET_START);
     const [startCell, setStartCell] = useState<ICell>(INIT_START);
     const [endCell, setEndCell] = useState<ICell>(INIT_END);
@@ -67,12 +68,11 @@ const Grid = (config: GridConfiguration) => {
         }
     };
 
-    const startDijkstra = () => {
+    const startAlgorithm = () => {
         clearBoard();
         setRunning(true)
-        const dijkstra = new Dijkstra(grid, startCell, endCell);
-        const visitedCells = dijkstra.compute();
-        const shortestPath = dijkstra.getShortestPath();
+        const visitedCells = algorithm.instance.compute(grid, startCell, endCell);
+        const shortestPath = algorithm.instance.getShortestPath();
         animate(visitedCells, shortestPath);
     }
 
@@ -121,19 +121,47 @@ const Grid = (config: GridConfiguration) => {
         setGrid(computeInitialGrid(config, startCell, endCell));
     }, [config, startCell, endCell])
 
+    const handleAlgorithmSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setAlgorithm(config.algorithms[parseInt(e.target.value)])
+    }
+
     return (
         <div>
-            <div>
-                <input type="radio" value={OnClickEventType.SET_START} name="onClickEventType"
-                       checked={onClickType === OnClickEventType.SET_START}
-                       onChange={() => setOnClickType(OnClickEventType.SET_START)}/> Set Start
-                <input type="radio" value={OnClickEventType.SET_FINISH} name="onClickEventType"
-                       checked={onClickType === OnClickEventType.SET_FINISH}
-                       onChange={() => setOnClickType(OnClickEventType.SET_FINISH)}/> Set Finish
+            <div className="algorithm-selection">
+                <label>Select Algorithm:</label>
+                <div className="custom-select">
+                    <select onChange={(e) => handleAlgorithmSelection(e)}>
+                        {
+                            config.algorithms.map((algo, idx) => {
+                                return <option key={idx} value={idx}>{algo.name}</option>
+                            })
+                        }
+                    </select>
+                </div>
 
-                <button disabled=
-                            {isRunning} onClick={() => startDijkstra()}>Start Dijkstra Algorithm
+                <button className="start-btn" disabled={isRunning}
+                        onClick={() => startAlgorithm()}>
+                    Start Visualization
                 </button>
+            </div>
+
+            <div style={{display: "flex", justifyContent: "center"}}>
+                <p>
+                    <input id="setStart" type="radio" value={OnClickEventType.SET_START} name="onClickEventType"
+                           checked={onClickType === OnClickEventType.SET_START}
+                           onChange={() => setOnClickType(OnClickEventType.SET_START)}/>
+                    <label htmlFor={"setStart"}>Set Start</label>
+                </p>
+
+                <p>
+                    <input id="setFinish" type="radio" value={OnClickEventType.SET_FINISH} name="onClickEventType"
+                           checked={onClickType === OnClickEventType.SET_FINISH}
+                           onChange={() => setOnClickType(OnClickEventType.SET_FINISH)}/>
+                    <label htmlFor={"setFinish"}>Set Finish</label>
+                </p>
+            </div>
+
+            <div>
                 <div className="grid__container">
                     {
                         grid.map((row, rowIdx) => {
