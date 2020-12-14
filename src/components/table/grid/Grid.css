@@ -13,7 +13,7 @@
 .algorithm-selection {
     margin: 30px;
     display: grid;
-    grid-template-columns: 150px 200px 200px;
+    grid-template-columns: 150px 200px 200px 100px;
     column-gap: 50px;
     justify-content: center;
     align-items: center;

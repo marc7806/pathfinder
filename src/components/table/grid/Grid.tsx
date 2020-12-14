@@ -63,15 +63,20 @@ const Grid = (config: GridConfiguration) => {
                 startCell.isStart = false;
                 cell.isStart = true
                 setStartCell(cell);
-                clearBoard();
                 break;
             case OnClickEventType.SET_FINISH:
                 endCell.isFinish = false;
                 cell.isFinish = true
                 setEndCell(cell);
-                clearBoard();
+                break;
+            case OnClickEventType.SET_WALL:
+                cell.isWall = true;
+                break;
+            case OnClickEventType.REMOVE_WALL:
+                cell.isWall = false;
                 break;
         }
+        clearBoard();
     };
 
     const startAlgorithm = () => {
@@ -122,6 +127,11 @@ const Grid = (config: GridConfiguration) => {
         }
     }
 
+    const clearAll = () => {
+        clearBoard();
+        setGrid(computeInitialGrid(config, startCell, endCell))
+    }
+
     useEffect(() => {
         setGrid(computeInitialGrid(config, startCell, endCell));
     }, [config, startCell, endCell])
@@ -132,7 +142,8 @@ const Grid = (config: GridConfiguration) => {
 
     const handleMouseDown = () => {
         setMouseDown(true);
-        window.addEventListener('mouseup', handleMouseUp, true)
+        window.addEventListener('mouseup', handleMouseUp, true);
+        clearBoard();
     }
 
     const handleMouseUp = () => {
@@ -167,6 +178,11 @@ const Grid = (config: GridConfiguration) => {
                 <button className="start-btn" disabled={isRunning}
                         onClick={() => startAlgorithm()}>
                     Start Visualization
+                </button>
+
+                <button className="start-btn" disabled={isRunning}
+                        onClick={() => clearAll()}>
+                    Clear
                 </button>
             </div>
 
