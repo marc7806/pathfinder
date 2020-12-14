@@ -14,7 +14,8 @@ export interface ICoordinate {
 export interface ICell {
     coordinate: ICoordinate,
     isStart: boolean,
-    isFinish: boolean
+    isFinish: boolean,
+    isWall: boolean
 }
 
 export interface INode {
@@ -30,7 +31,9 @@ export interface Algorithm {
 
 export enum OnClickEventType {
     SET_FINISH,
-    SET_START
+    SET_START,
+    SET_WALL,
+    REMOVE_WALL
 }
 
 export function cellToNode(cell: ICell, distance: number, prev: INode): INode {

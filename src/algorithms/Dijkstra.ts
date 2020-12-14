@@ -1,5 +1,5 @@
 import {AbstractAlgorithm} from "./AbstractAlgorithm";
-import {cellToNode, ICell, INode} from "../types/GridTypes";
+import {ICell, INode} from "../types/GridTypes";
 import {MinHeap} from "../data-structures/MinHeap";
 import {isEqual} from "../utils/Utils";
 
@@ -19,6 +19,7 @@ export class Dijkstra extends AbstractAlgorithm {
     }
 
     compute(grid: Array<ICell[]>, startCell: ICell, endCell: ICell): Array<ICell> {
+        this.finishNode = null;
         let visitedCellsInOrder: Array<ICell> = [];
 
         const start = {
@@ -33,7 +34,7 @@ export class Dijkstra extends AbstractAlgorithm {
         while (!isFinished) {
             let curr: INode | undefined = minHeap.removeTop();
             if (curr) {
-                if (!curr.cell.isStart) {
+                if (!curr.cell.isStart && !curr.cell.isWall) {
                     visitedCellsInOrder.push(curr.cell);
                 }
 
@@ -54,26 +55,6 @@ export class Dijkstra extends AbstractAlgorithm {
         }
 
         return visitedCellsInOrder;
-    }
-
-    private findNeighbors(node: INode, grid: Array<ICell[]>) {
-        let neighbors: Array<INode> = [];
-        let {coordinate} = node.cell;
-
-        if (grid[coordinate.row + 1]) {
-            neighbors.push(cellToNode(grid[coordinate.row + 1][coordinate.col], node.distance + 1, node))
-        }
-        if (grid[coordinate.row - 1]) {
-            neighbors.push(cellToNode(grid[coordinate.row - 1][coordinate.col], node.distance + 1, node))
-        }
-        if (grid[coordinate.row][coordinate.col + 1]) {
-            neighbors.push(cellToNode(grid[coordinate.row][coordinate.col + 1], node.distance + 1, node))
-        }
-        if (grid[coordinate.row][coordinate.col - 1]) {
-            neighbors.push(cellToNode(grid[coordinate.row][coordinate.col - 1], node.distance + 1, node))
-        }
-
-        return neighbors;
     }
 
     getShortestPath(): Array<ICell> {

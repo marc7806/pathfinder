@@ -11,6 +11,7 @@ let INIT_START: ICell = {
     },
     isStart: true,
     isFinish: false,
+    isWall: false
 };
 
 let INIT_END: ICell = {
@@ -20,6 +21,7 @@ let INIT_END: ICell = {
     },
     isStart: false,
     isFinish: true,
+    isWall: false
 };
 
 const computeInitialGrid = (config: GridConfiguration, startCell: ICell, endCell: ICell): Array<ICell[]> => {
@@ -31,6 +33,7 @@ const computeInitialGrid = (config: GridConfiguration, startCell: ICell, endCell
             currRow.push({
                 isStart: col === startCell.coordinate.col && row === startCell.coordinate.row,
                 isFinish: col === endCell.coordinate.col && row === endCell.coordinate.row,
+                isWall: false,
                 coordinate: {
                     row: row,
                     col: col
@@ -50,6 +53,7 @@ const Grid = (config: GridConfiguration) => {
     const [endCell, setEndCell] = useState<ICell>(INIT_END);
     const [isRunning, setRunning] = useState(false);
     const [visitedElements, setVisitedElements] = useState<Array<Element>>([]);
+    const [isMouseDown, setMouseDown] = useState<boolean>(false);
 
     const handleOnClick = (cell: ICell) => {
         if (isRunning) return
@@ -59,11 +63,13 @@ const Grid = (config: GridConfiguration) => {
                 startCell.isStart = false;
                 cell.isStart = true
                 setStartCell(cell);
+                clearBoard();
                 break;
             case OnClickEventType.SET_FINISH:
                 endCell.isFinish = false;
                 cell.isFinish = true
                 setEndCell(cell);
+                clearBoard();
                 break;
         }
     };
@@ -117,12 +123,31 @@ const Grid = (config: GridConfiguration) => {
     }
 
     useEffect(() => {
-        clearBoard();
         setGrid(computeInitialGrid(config, startCell, endCell));
     }, [config, startCell, endCell])
 
     const handleAlgorithmSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setAlgorithm(config.algorithms[parseInt(e.target.value)])
+    }
+
+    const handleMouseDown = () => {
+        setMouseDown(true);
+        window.addEventListener('mouseup', handleMouseUp, true)
+    }
+
+    const handleMouseUp = () => {
+        setMouseDown(false);
+        window.removeEventListener('mouseup', handleMouseUp, true);
+    }
+
+    const handleOnMouseEnter = (cell: ICell) => {
+        if (isMouseDown && !isRunning) {
+            if (onClickType === OnClickEventType.SET_WALL) {
+                cell.isWall = true
+            } else if (onClickType === OnClickEventType.REMOVE_WALL) {
+                cell.isWall = false;
+            }
+        }
     }
 
     return (
@@ -159,6 +184,20 @@ const Grid = (config: GridConfiguration) => {
                            onChange={() => setOnClickType(OnClickEventType.SET_FINISH)}/>
                     <label htmlFor={"setFinish"}>Set Finish</label>
                 </p>
+
+                <p>
+                    <input id="setWall" type="radio" value={OnClickEventType.SET_WALL} name="onClickEventType"
+                           checked={onClickType === OnClickEventType.SET_WALL}
+                           onChange={() => setOnClickType(OnClickEventType.SET_WALL)}/>
+                    <label htmlFor={"setWall"}>Set Wall</label>
+                </p>
+
+                <p>
+                    <input id="removeWall" type="radio" value={OnClickEventType.REMOVE_WALL} name="onClickEventType"
+                           checked={onClickType === OnClickEventType.REMOVE_WALL}
+                           onChange={() => setOnClickType(OnClickEventType.REMOVE_WALL)}/>
+                    <label htmlFor={"removeWall"}>Unset Wall</label>
+                </p>
             </div>
 
             <div>
@@ -166,8 +205,13 @@ const Grid = (config: GridConfiguration) => {
                     {
                         grid.map((row, rowIdx) => {
                             return <div key={rowIdx} className="grid__container__row">
-                                {row.map((cell, cellIdx) => <Cell key={cellIdx} cell={cell}
-                                                                  onClickHandler={(cell: ICell) => handleOnClick(cell)}/>)}
+                                {row.map((cell, cellIdx) =>
+                                    <Cell key={cellIdx} cell={cell}
+                                          onMouseDownHandler={() => handleMouseDown()}
+                                          onMouseUpHandler={() => handleMouseUp()}
+                                          onMouseEnterHandler={(cell: ICell) => handleOnMouseEnter(cell)}
+                                          onClickHandler={(cell: ICell) => handleOnClick(cell)}
+                                    />)}
                             </div>
                         })
                     }
