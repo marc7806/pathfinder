@@ -1,7 +1,6 @@
 import {AbstractAlgorithm} from "./AbstractAlgorithm";
-import {ICell, INode} from "../types/GridTypes";
+import {cellToNode, ICell, INode} from "../types/GridTypes";
 import {MinHeap} from "../data-structures/MinHeap";
-import {isEqual} from "../utils/Utils";
 
 /**
  * Dijkstra is a Greedy algorithm
@@ -22,54 +21,69 @@ export class Dijkstra extends AbstractAlgorithm {
         this.finishNode = null;
         let visitedCellsInOrder: Array<ICell> = [];
 
-        const start = {
-            cell: startCell,
-            distance: 0,
-            prev: null
-        };
-        let minHeap = new MinHeap();
-        minHeap.insert(start);
+        const start = cellToNode(startCell, 0, 0, null);
+        let open = new MinHeap();
+        open.insert(start);
 
-        let isFinished = false;
-        while (!isFinished) {
-            let curr: INode | undefined = minHeap.removeTop();
-            if (curr) {
-                if (!curr.cell.isStart && !curr.cell.isWall) {
-                    visitedCellsInOrder.push(curr.cell);
-                }
-
-                let neighbors: Array<INode> = this.findNeighbors(curr, grid);
-                neighbors.forEach(n => {
-                    if (isEqual(n.cell.coordinate, endCell.coordinate)) {
-                        isFinished = true;
-                        this.finishNode = n;
-                    } else if (!visitedCellsInOrder.includes(n.cell) && !minHeap.data.includes(n)
-                        && minHeap.data.filter(md => isEqual(md.cell.coordinate, n.cell.coordinate)).length === 0) {
-                        minHeap.insert(n);
-                    }
-                });
-            } else {
-                console.log("Undefined node")
-                break;
+        while (!open.isEmpty()) {
+            let next: INode = open.removeTop();
+            let nextCell = next.cell;
+            if (nextCell.isFinish) {
+                // end here because end cell found!
+                this.finishNode = next;
+                break
             }
+
+            // mark cell as visited
+            if (!nextCell.isStart && !nextCell.isWall) {
+                visitedCellsInOrder.push(nextCell);
+            }
+
+            let neighbors: Array<INode> = this.findNeighbors(next, grid);
+
+            neighbors.forEach(neighbor => {
+                if (!visitedCellsInOrder.includes(neighbor.cell) && !open.includes(neighbor)) {
+                    open.insert(neighbor);
+                }
+            });
         }
 
         return visitedCellsInOrder;
     }
 
-    getShortestPath(): Array<ICell> {
-        let shortestPath: Array<ICell> = [];
+    findNeighbors(node: INode, grid: Array<ICell[]>) {
+        let neighbors: Array<INode> = [];
+        let {coordinate} = node.cell;
 
-        if (this.finishNode) {
-            let curr: INode = this.finishNode
-            while (curr?.prev) {
-                if (!curr.cell.isStart && !curr.cell.isFinish) {
-                    shortestPath.push(curr.cell);
-                }
-                curr = curr.prev;
+        if (grid[coordinate.row + 1]) {
+            const n = grid[coordinate.row + 1][coordinate.col];
+
+            if (!n.isWall) {
+                neighbors.push(cellToNode(n, node.distance + 1, 0, node))
+            }
+        }
+        if (grid[coordinate.row - 1]) {
+            const n = grid[coordinate.row - 1][coordinate.col];
+
+            if (!n.isWall) {
+                neighbors.push(cellToNode(n, node.distance + 1, 0, node))
+            }
+        }
+        if (grid[coordinate.row][coordinate.col + 1]) {
+            const n = grid[coordinate.row][coordinate.col + 1];
+
+            if (!n.isWall) {
+                neighbors.push(cellToNode(n, node.distance + 1, 0, node))
+            }
+        }
+        if (grid[coordinate.row][coordinate.col - 1]) {
+            const n = grid[coordinate.row][coordinate.col - 1];
+
+            if (!n.isWall) {
+                neighbors.push(cellToNode(n, node.distance + 1, 0, node))
             }
         }
 
-        return shortestPath.reverse();
+        return neighbors;
     }
 }

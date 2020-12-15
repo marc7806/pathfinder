@@ -1,4 +1,8 @@
-import {cellToNode, ICell, INode} from "../types/GridTypes";
+import {ICell, INode} from "../types/GridTypes";
+
+interface DistanceFunc {
+    (node: INode): number
+}
 
 export abstract class AbstractAlgorithm {
     protected finishNode: INode | null;
@@ -9,41 +13,19 @@ export abstract class AbstractAlgorithm {
 
     abstract compute(grid: Array<ICell[]>, startCell: ICell, endCell: ICell): Array<ICell>;
 
-    abstract getShortestPath(): Array<ICell>;
+    public getShortestPath(): Array<ICell> {
+        let shortestPath: Array<ICell> = [];
 
-    protected findNeighbors(node: INode, grid: Array<ICell[]>) {
-        let neighbors: Array<INode> = [];
-        let {coordinate} = node.cell;
-
-        if (grid[coordinate.row + 1]) {
-            const n = grid[coordinate.row + 1][coordinate.col];
-
-            if (!n.isWall) {
-                neighbors.push(cellToNode(n, node.distance + 1, node))
-            }
-        }
-        if (grid[coordinate.row - 1]) {
-            const n = grid[coordinate.row - 1][coordinate.col];
-
-            if (!n.isWall) {
-                neighbors.push(cellToNode(n, node.distance + 1, node))
-            }
-        }
-        if (grid[coordinate.row][coordinate.col + 1]) {
-            const n = grid[coordinate.row][coordinate.col + 1];
-
-            if (!n.isWall) {
-                neighbors.push(cellToNode(n, node.distance + 1, node))
-            }
-        }
-        if (grid[coordinate.row][coordinate.col - 1]) {
-            const n = grid[coordinate.row][coordinate.col - 1];
-
-            if (!n.isWall) {
-                neighbors.push(cellToNode(n, node.distance + 1, node))
+        if (this.finishNode) {
+            let curr: INode = this.finishNode
+            while (curr?.prev) {
+                if (!curr.cell.isStart && !curr.cell.isFinish) {
+                    shortestPath.push(curr.cell);
+                }
+                curr = curr.prev;
             }
         }
 
-        return neighbors;
+        return shortestPath.reverse();
     }
 }

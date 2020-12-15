@@ -21,7 +21,10 @@ export interface ICell {
 export interface INode {
     cell: ICell,
     distance: number,
-    prev: INode | null
+    prev: INode | null,
+
+    // for A* algorithm
+    gScore: number,
 }
 
 export interface Algorithm {
@@ -36,10 +39,13 @@ export enum OnClickEventType {
     REMOVE_WALL
 }
 
-export function cellToNode(cell: ICell, distance: number, prev: INode): INode {
+export function cellToNode(cell: ICell, distance: number,
+                           gScore: number,
+                           prev: INode | null): INode {
     return {
         cell: cell,
         distance: distance,
+        gScore: gScore,
         prev: prev
     }
 }
